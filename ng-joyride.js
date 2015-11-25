@@ -25,9 +25,10 @@
         );
     }]);
     drctv.factory('joyrideElement', ['$timeout', '$compile', '$sce', function ($timeout, $compile, $sce) {
-        function Element(config, currentStep, template, loadTemplateFn, hasReachedEndFn, goToNextFn,
+        function Element(config, currentStep, scope, template, loadTemplateFn, hasReachedEndFn, goToNextFn,
                          goToPrevFn, skipDemoFn,isEnd, curtainClass , addClassToCurtain, shouldDisablePrevious, attachTobody) {
             this.currentStep = currentStep;
+            this.scope = scope;
             this.content = $sce.trustAsHtml(config.text);
             this.selector = config.selector;
             this.template = template || 'ng-joyride-tplv1.html';
@@ -157,7 +158,9 @@
                 $fkEl.popover({
                     title: this.heading,
                     template: html,
-                    content: this.popoverTemplate,
+                    content: (function(_this) {
+                        return function() { return $compile(_this.popoverTemplate)(_this.scope) }
+                    })(this),
                     html: true,
                     placement: this.placement,
                     trigger:'manual',
@@ -548,7 +551,7 @@
                                 disablePrevious = isFirst;
                                 isFirst = isFirst ? false:false;
 
-                                return new joyrideElement(step, count, options.templateUri, loadTemplate, hasReachedEnd, goToNext, goToPrev, skipDemo, count === (options.config.length-1),step.curtainClass,changeCurtainClass, disablePrevious ,step.attachToBody);
+                                return new joyrideElement(step, count, scope, options.templateUri, loadTemplate, hasReachedEnd, goToNext, goToPrev, skipDemo, count === (options.config.length-1),step.curtainClass,changeCurtainClass, disablePrevious ,step.attachToBody);
 
                             case "title":
                                 disablePrevious = isFirst;
